@@ -537,7 +537,7 @@ int main(int argc, char **argv)
         {
             long double gbits_transferred = 8.0 * buff_len * bench_options.iters * ((bench_options.uni_dir == 1) ? 1.0 : 2.0) * 1e-9;
             long double bandwidth = (gbits_transferred * 1.0) / my_time;
-            fprintf(stderr, "[Rank: %d Run#: %lld]: Total Gbits: %Lf, Bandwidth: %.2Lf Gbps\n", world_rank, run_idx, gbits_transferred, bandwidth);
+            //fprintf(stderr, "[Rank: %d Run#: %lld]: Total Gbits: %Lf, Bandwidth: %.2Lf Gbps\n", world_rank, run_idx, gbits_transferred, bandwidth);
         }
 #endif
 
