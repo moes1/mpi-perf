@@ -184,7 +184,7 @@ int main(int argc, char **argv)
             long double gbits_transferred = 8.0 * MSG_SZ * ITERS_MAX * (2.0) * 1e-9;
             long double bandwidth = (gbits_transferred * 1.0) / my_time;
 	    sum_bandwidth += bandwidth;
-            fprintf(stderr, "[Rank: %d]: Bandwidth: %.2Lf Gbps\n", world_rank, bandwidth);
+            //fprintf(stderr, "[Rank: %d]: Bandwidth: %.2Lf Gbps\n", world_rank, bandwidth);
         }
 #endif
     
