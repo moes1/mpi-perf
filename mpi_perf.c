@@ -219,7 +219,7 @@ int main(int argc, char **argv)
                for (int rankr=0;rankr<8;rankr++)
                {
                     long double bandwidth = bandwidths[8*rankl+rankr] / count[8*rankl+rankr];
-                    fprintf(stderr,"[Rank1: %d, Rank2: %d]: Bandwidth: %.2Lf Gbps\n",rankl,rankr,bandwidth);
+                    fprintf(stderr,"[Group0 Local Rank: %d, Group1 Local Rank: %d]: Bandwidth: %.2Lf Gbps\n",rankl,rankr,bandwidth);
                }
            }
        }
