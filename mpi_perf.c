@@ -136,6 +136,9 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
+    long double bandwidths[64] = { 0.0 };
+    long long int count[64] = { 0 };
+
     int peer_rank;
     if (world_rank < 8)
     {
@@ -183,29 +186,47 @@ int main(int argc, char **argv)
         {
             long double gbits_transferred = 8.0 * MSG_SZ * ITERS_MAX * (2.0) * 1e-9;
             long double bandwidth = (gbits_transferred * 1.0) / my_time;
+
+	    bandwidths[8*node_local_rank+peer_rank] += bandwidth;
+            count[8*node_local_rank+peer_rank] += 1;
+
 	    sum_bandwidth += bandwidth;
             //fprintf(stderr, "[Rank: %d]: Bandwidth: %.2Lf Gbps\n", world_rank, bandwidth);
         }
 #endif
     
 	if (world_rank < 8)
-    {
+        {
 	    peer_rank = (peer_rank + 1) % 8 + 8;
-    }
-    else
-    {
+        }
+        else
+        {
 	    peer_rank = peer_rank == 0 ? 7 : (peer_rank - 1) % 8;
-    }
+        }
 
-    //fprintf(stderr, "[Rank: %d] peer: %d\n", world_rank, peer_rank);
+        //fprintf(stderr, "[Rank: %d] peer: %d\n", world_rank, peer_rank);
 
         MPI_Barrier(MPI_COMM_WORLD);
     }
-        if (my_group == 0)
-            fprintf(stderr, "[Rank: %d]: Bandwidth: %.2Lf Gbps\n", world_rank, sum_bandwidth / RUN_MAX);
+    MPI_Allreduce( bandwidths, bandwidths, 64, MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce( count, count, 64, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
+    if (my_group == 0)
+    {
+        if (node_local_rank == 0)
+       {
+           for (int rankl=0;rankl<8;rankl++)
+           {
+               for (int rankr=0;rankr<8;rankr++)
+               {
+                    long double bandwidth = bandwidths[8*rankl+rankr] / count[8*rankl+rankr];
+                    fprintf(stderr,"[Rank1: %d, Rank2: %d]: Bandwidth: %.2Lf Gbps\n",rankl,rankr,bandwidth);
+               }
+           }
+       }
+    }
 
-        free(buffer_tx);
-        free(buffer_rx);
+    free(buffer_tx);
+    free(buffer_rx);
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
